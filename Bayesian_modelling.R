@@ -210,7 +210,7 @@ nd <- audits |> data_grid(Num_employees_s = mean(Num_employees_s, na.rm=TRUE),
                           Seasonal_operations, Municipal_water, Sausages,
                           Blood_products, Dried_meats, Fermented_meats, Jerky, 
                           Wet_cured, Smoked) |> 
-  distinct(Operation_type.x, .keep_all = TRUE)
+  distinct(Operation_type.x,  .keep_all = TRUE)
 
 pred <- predictions(m2, re_formula = NA, type = "response",
                     newdata = nd) |> 
@@ -242,11 +242,11 @@ p1 + p2
 # Municipal water
 
 nd <- audits |> data_grid(Num_employees_s = mean(Num_employees_s, na.rm=TRUE), 
-                          Operation_type.x, year, week_day,
+                          Operation_type.x, year = 2019, week_day,
                           Seasonal_operations, Municipal_water, Sausages,
                           Blood_products, Dried_meats, Fermented_meats, Jerky, 
                           Wet_cured, Smoked) |> 
-  distinct(Municipal_water,  year, .keep_all = TRUE)
+  distinct(Municipal_water, .keep_all = TRUE)
 
 pred <- predictions(m2, re_formula = NA, type = "response",
                     newdata = nd) |> 
