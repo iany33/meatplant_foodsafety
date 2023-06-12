@@ -1,14 +1,4 @@
-
-pacman::p_load(brms,
-               Matrix,
-               tidyverse,  
-               janitor,
-               tidybayes, 
-               bayesplot,
-               marginaleffects,
-               modelr,
-               patchwork)
-
+get
 
 # Start with logistic model of overall audit pass rating outcome
 # Start with model containing only operation type and number of employees, with varying effect for plant
@@ -68,6 +58,9 @@ mcmc_pairs(m2, pars = vars(contains("Yes")), diag_fun = "den", off_diag_fun = "h
 conditional_effects(m2)
 
 plot_predictions(m2, condition = "Num_employees_s")
+
+performance::model_performance(m2)
+
 
 ### Examine fail/infraction rate outcome in separate model
 
@@ -162,6 +155,20 @@ loo(r2, r3)
 
 conditional_effects(r3)
 
+# Plot distribution of rate (mu) and shape (phi) for outcome
+
+mcmc_plot(r3, variable = c("sd_Plant_ID__Intercept", "shape"))
+
+post <- as_draws_df(r3)
+post |> mutate(theta = exp(b_Intercept) / shape) |> 
+  ggplot(aes(x = theta)) +  
+    geom_density()
+
+post |> mutate(mu = exp(b_Intercept), phi = shape) |> 
+  pivot_longer(mu:phi, names_to = "parameter") |>
+  ggplot(aes(x = value)) +
+  geom_density(fill = "steelblue") + 
+  facet_wrap(~fct_relevel(parameter, "mu"))
 
 ### Now produce marginal effects of key parameters
 
@@ -201,7 +208,19 @@ ggplot(pred, aes(x = Num_employees, y = draw)) +
   theme(legend.position = "bottom")
 
 avg_slopes(m2, re_formula = NA, type = "response", variables = "Num_employees_s", 
-          newdata = nd)
+          newdata = nd) |> tidy()
+
+avg_slopes(m2, re_formula = NA, type = "link", variables = "Num_employees_s", 
+           newdata = nd) |> tidy()
+
+mfx <- slopes(m2, re_formula = NA, type = "response", variables = "Num_employees_s", 
+            newdata = nd) |> posteriordraws()
+
+ggplot(mfx, aes(x = draw, fill = Num_employees)) +
+  stat_halfeye(slab_alpha = .5, fill = "#7570B3")  +
+  labs(x = "Effect of Number of Employees on Passing Probability", y = "") +
+  theme_minimal() +
+  theme(legend.position = "bottom") 
 
 # Operation type
 
@@ -225,7 +244,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Operation_type.x)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(m2, re_formula = NA, type = "response", variables = "Operation_type.x", 
-            newdata = nd)
+            newdata = nd) |> tidy()
+
+avg_comparisons(m2, re_formula = NA, type = "link", variables = "Operation_type.x", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(m2, re_formula = NA, type = "response", variables = "Operation_type.x", 
                    newdata = nd) |> posteriordraws()
@@ -261,7 +283,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Municipal_water)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(m2, re_formula = NA, type = "response", variables = "Municipal_water", 
-            newdata = nd) 
+            newdata = nd) |> tidy()
+
+avg_comparisons(m2, re_formula = NA, type = "link", variables = "Municipal_water", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(m2, re_formula = NA, type = "response", variables = "Municipal_water", 
                    newdata = nd) |> posteriordraws()
@@ -297,7 +322,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Jerky)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(m2, re_formula = NA, type = "response", variables = "Jerky", 
-                newdata = nd) 
+                newdata = nd) |> tidy()
+
+avg_comparisons(m2, re_formula = NA, type = "link", variables = "Jerky", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(m2, re_formula = NA, type = "response", variables = "Jerky", 
                    newdata = nd) |> posteriordraws()
@@ -341,8 +369,20 @@ ggplot(pred, aes(x = Num_employees, y = draw)) +
   theme_classic() + 
   theme(legend.position = "bottom")
 
-avg_slopes(r2, re_formula = NA, type = "response", variables = "Num_employees_s", 
-           newdata = nd)
+avg_slopes(r3, re_formula = NA, type = "response", variables = "Num_employees_s", 
+           newdata = nd) |> tidy()
+
+avg_slopes(r3, re_formula = NA, type = "link", variables = "Num_employees_s", 
+           newdata = nd) |> tidy()
+
+mfx <- slopes(r3, re_formula = NA, type = "response", variables = "Num_employees_s", 
+              newdata = nd) |> posteriordraws()
+
+ggplot(mfx, aes(x = draw, fill = Num_employees)) +
+  stat_halfeye(slab_alpha = .5, fill = "#7570B3")  +
+  labs(x = "Effect of Number of Employees on Passing Probability", y = "") +
+  theme_minimal() +
+  theme(legend.position = "bottom") 
 
 # Operation type
 
@@ -366,7 +406,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Operation_type.x)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Operation_type.x", 
-            newdata = nd) 
+            newdata = nd) |> tidy()
+
+avg_comparisons(r3, re_formula = NA, type = "link", variables = "Operation_type.x", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(r3, re_formula = NA, type = "response", variables = "Operation_type.x", 
                    newdata = nd) |> posteriordraws()
@@ -402,7 +445,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Jerky)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Jerky", 
-            newdata = nd) 
+            newdata = nd) |> tidy()
+
+avg_comparisons(r3, re_formula = NA, type = "link", variables = "Jerky", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(r3, re_formula = NA, type = "response", variables = "Jerky", 
                    newdata = nd) |> posteriordraws()
@@ -438,7 +484,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Municipal_water)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Municipal_water", 
-            newdata = nd) 
+            newdata = nd) |> tidy()
+
+avg_comparisons(r3, re_formula = NA, type = "link", variables = "Municipal_water", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(r3, re_formula = NA, type = "response", variables = "Municipal_water", 
                    newdata = nd) |> posteriordraws()
@@ -474,7 +523,10 @@ p1 <- ggplot(pred, aes(x = draw, fill = Smoked)) +
   theme(legend.position = "bottom")  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Smoked", 
-                newdata = nd) 
+                newdata = nd) |> tidy()
+
+avg_comparisons(r3, re_formula = NA, type = "link", variables = "Smoked", 
+                newdata = nd) |> tidy()
 
 mfx <- comparisons(r3, re_formula = NA, type = "response", variables = "Smoked", 
                    newdata = nd) |> posteriordraws()
@@ -487,7 +539,4 @@ p2 <- ggplot(mfx, aes(x = draw, fill = contrast)) +
   theme(legend.position = "bottom") 
 
 p1 + p2
-
-
-
 
