@@ -1,4 +1,13 @@
-get
+
+pacman::p_load(brms,
+               Matrix,
+               tidyverse,  
+               janitor,
+               tidybayes, 
+               bayesplot,
+               marginaleffects,
+               modelr,
+               patchwork)
 
 # Start with logistic model of overall audit pass rating outcome
 # Start with model containing only operation type and number of employees, with varying effect for plant
@@ -168,6 +177,9 @@ post |> mutate(mu = exp(b_Intercept), phi = shape) |>
   pivot_longer(mu:phi, names_to = "parameter") |>
   ggplot(aes(x = value)) +
   geom_density(fill = "steelblue") + 
+  labs(
+    x = "Value",
+    y = "Density") +
   facet_wrap(~fct_relevel(parameter, "mu"))
 
 ### Now produce marginal effects of key parameters

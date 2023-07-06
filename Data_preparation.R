@@ -113,6 +113,17 @@ audits |> mutate(Rating3 = case_when(Rating2 == 1 ~ "Pass", Rating2 == 0 ~ "Cond
     x = "Overall audit rating",
     y = "Audit item pass rate" )
 
+audits |> mutate(Rating3 = case_when(Rating2 == 1 ~ "Pass", Rating2 == 0 ~ "Conditional Pass/Fail")) |> 
+  ggplot(aes(x = Rating3, y = fail_rate, fill = Rating3)) +
+  geom_violin(width = 1) +
+  geom_boxplot(width = 0.2) +  
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d(begin = 0.6, direction = -1) +
+  labs(
+    x = "Overall Audit Rating",
+    y = "Audit Item Fail Rate" )
+
 # Plot overall pass/conditional pass/fail proportion by year
 
 ggplot(audits) +
@@ -185,8 +196,8 @@ ggplot(audits) +
   geom_histogram(mapping = aes(x = fail_rate), binwidth = 0.005,
                  fill="#69b3a2", color="#e9ecef") +   
   theme_minimal() +
-  labs(x = "Audit item fail rate",
-       y = "Number of audits") 
+  labs(x = "Audit Item Fail Rate",
+       y = "Number of Audits") 
 
 
 # Recode variables and create some combinations
