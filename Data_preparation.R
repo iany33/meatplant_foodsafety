@@ -122,7 +122,10 @@ audits |> mutate(Rating3 = case_when(Rating2 == 1 ~ "Pass", Rating2 == 0 ~ "Cond
   scale_fill_viridis_d(begin = 0.6, direction = -1) +
   labs(
     x = "Overall Audit Rating",
-    y = "Audit Item Fail Rate" )
+    y = "Audit Item Fail Rate" ) 
+
+ggsave("Figure 1.tif", width = (6/1.618), height = 6, device='tiff', dpi=300, bg = 'white')
+
 
 # Plot overall pass/conditional pass/fail proportion by year
 

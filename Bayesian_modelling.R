@@ -182,6 +182,8 @@ post |> mutate(mu = exp(b_Intercept), phi = shape) |>
     y = "Density") +
   facet_wrap(~fct_relevel(parameter, "mu"))
 
+ggsave("Figure S6.tif", width = 6, height = 6, device='tiff', dpi=300, bg = 'white')
+
 ### Now produce marginal effects of key parameters
 
 audits |> rstatix::get_summary_stats(Num_employees, Num_employees_s)
@@ -219,6 +221,9 @@ ggplot(pred, aes(x = Num_employees, y = draw)) +
   theme_classic() + 
   theme(legend.position = "bottom")
 
+ggsave("Figure 3.tif", width = 6, height = 5, device='tiff', dpi=300, bg = 'white')
+
+
 avg_slopes(m2, re_formula = NA, type = "response", variables = "Num_employees_s", 
           newdata = nd) |> tidy()
 
@@ -253,7 +258,7 @@ p1 <- ggplot(pred, aes(x = draw, fill = Operation_type.x)) +
     labs(x = "Predicted Probability of Passing an Audit", y = "Probability Density",
        subtitle = "Posterior Predictions") +
   theme_minimal() +
-  theme(legend.position = "bottom")  
+  theme(legend.position = "bottom", axis.title=element_text(size=8))  
 
 avg_comparisons(m2, re_formula = NA, type = "response", variables = "Operation_type.x", 
             newdata = nd) |> tidy()
@@ -269,9 +274,11 @@ p2 <- ggplot(mfx, aes(x = draw, fill = contrast)) +
   labs(x = "Effect of Operation Type on Passing Probability", y = "",
        subtitle = "Contrast (FSMP vs. Abattoir)") +
   theme_minimal() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom", axis.title=element_text(size=8))
 
 p1 + p2
+
+ggsave("Figure 2.tif", width = 6, height = (6/1.618), device='tiff', dpi=300, bg = 'white')
 
 # Municipal water
 
@@ -415,7 +422,7 @@ p1 <- ggplot(pred, aes(x = draw, fill = Operation_type.x)) +
   labs(x = "Predicted Audit Item Fail Rate", y = "Probability Density",
        subtitle = "Posterior Predictions") +
   theme_minimal() +
-  theme(legend.position = "bottom")  
+  theme(legend.position = "bottom", axis.title=element_text(size=8))  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Operation_type.x", 
             newdata = nd) |> tidy()
@@ -431,9 +438,11 @@ p2 <- ggplot(mfx, aes(x = draw, fill = contrast)) +
   labs(x = "Effect of Operation Type on Audit Item Fail Rate", y = "",
        subtitle = "Contrast (FSMP vs. Abattoir)") +
   theme_minimal() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom", axis.title=element_text(size=8)) 
 
 p1 + p2
+
+ggsave("Figure 4.tif", width = 6, height = (6/1.618), device='tiff', dpi=300, bg = 'white')
 
 # Jerky production
 
@@ -454,7 +463,7 @@ p1 <- ggplot(pred, aes(x = draw, fill = Jerky)) +
   labs(x = "Predicted Audit Item Fail Rate", y = "Probability Density",
        subtitle = "Posterior Predictions") +
   theme_minimal() +
-  theme(legend.position = "bottom")  
+  theme(legend.position = "bottom", axis.title=element_text(size=8))  
 
 avg_comparisons(r3, re_formula = NA, type = "response", variables = "Jerky", 
             newdata = nd) |> tidy()
@@ -470,9 +479,11 @@ p2 <- ggplot(mfx, aes(x = draw, fill = contrast)) +
   labs(x = "Effect of Jerky Production on Audit Item Fail Rate", y = "",
        subtitle = "Contrast (Yes vs. No)") +
   theme_minimal() +
-  theme(legend.position = "bottom") 
+  theme(legend.position = "bottom", axis.title=element_text(size=8)) 
 
 p1 + p2
+
+ggsave("Figure 5.tif", width = 6, height = (6/1.618), device='tiff', dpi=300, bg = 'white')
 
 # Municipal water
 
